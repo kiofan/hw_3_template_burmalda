@@ -5,13 +5,32 @@ services:
       - "${APP_PORT:-8080}:8000"
     environment:
       GREETING: "${GREETING:-Hello}"
-      STORAGE: "sqlite"
+      STORAGE: "redis"
       PORT: "8000"
-      DATA_FILE: "/data/counter.db"
+      REDIS_URL: "redis://redis:6379/0"
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
     volumes:
-      - counter-data:/data
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     restart: unless-stopped
 
 volumes:
-  counter-data:
+  redis-data:
+
 
