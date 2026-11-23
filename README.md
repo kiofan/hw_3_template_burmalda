@@ -1,3 +1,38 @@
-## Шаблон для третьего ДЗ по ИПР
+HW 3 — Docker
 
-Условие дз доступно по [ссылке](https://github.com/Nikfilk2030/missing_semester_hse_cs/blob/main/2026/amcs/year_1/hw_3/README.md)
+Приложение со счётчиком. Запускается через Docker Compose, для хранения данных используется Redis.
+
+Запуск
+
+Нужны Docker и Docker Compose.
+
+
+cp .env.example .env
+docker compose up -d --build
+
+
+Приложение доступно по адресу http://localhost:8080/
+
+Настройки
+
+В .env можно изменить:
+
+- GREETING — приветствие.
+- APP_PORT — порт приложения (по умолчанию 8080).
+
+Используются два сервиса:
+- app — приложение.
+- redis — хранилище счётчика.
+
+Redis сохраняет данные в именованный том redis-data. Оба сервиса имеют healthcheck.
+
+проверка
+
+curl http://localhost:8080/
+curl -X POST http://localhost:8080/increment
+curl http://localhost:8080/healthz
+curl http://localhost:8080/readyz
+
+Остановка
+
+docker compose down
